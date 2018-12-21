@@ -1,0 +1,345 @@
+ip c
+
+ 0: d = 123
+ 1: d = d & 456
+ 2: d = d == 72
+ 3: c = d + c
+ 4: c = 0
+ 5: d = 0
+ 6: e = d | 65536
+ 7: d = 1107552
+ 8: f = e & 255
+ 9: d = d + f
+10: d = d & 16777215
+11: d = d * 65899
+12: d = d & 16777215
+13: f = 256 > e
+14: c = f + c
+15: c = c + 1
+16: c = 27
+17: f = 0
+18: b = f + 1
+19: b = b * 256
+20: b = b > e
+21: c = b + c
+22: c = c + 1
+23: c = 25
+24: f = f + 1
+25: c = 17
+26: e = f
+27: c = 7
+28: f = d == a
+29: c = f + c
+30: c = 5
+
+ 0: d = 123
+ 1: d = d & 456
+ 2: d = d == 72
+ 3: jmp d + 1
+ 4: goto 1
+ 5: d = 0
+ 6: e = d | 65536
+ 7: d = 1107552
+ 8: f = e & 255
+ 9: d = d + f
+10: d = d & 16777215
+11: d = d * 65899
+12: d = d & 16777215
+13: f = 256 > e
+14: jmp f + 1
+15: goto 17
+16: goto 28
+17: f = 0
+18: b = f + 1
+19: b = b * 256
+20: b = b > e
+21: jmp b + 1
+22: goto 24
+23: goto 26
+24: f = f + 1
+25: goto 18
+26: e = f
+27: goto 8
+28: f = d == a
+29: jmp f + 1
+30: goto 6
+
+------------
+
+ 0: d = 123
+loop1:
+ 1: d = d & 456
+ 2: d = d == 72
+ 3: jmp d + 1
+ 4: goto loop1
+ 5: d = 0
+loop2:
+ 6: e = d | 65536
+ 7: d = 1107552
+loop3:
+ 8: f = e & 255
+ 9: d = d + f
+10: d = d & 16777215
+11: d = d * 65899
+12: d = d & 16777215
+13: f = 256 > e
+14: jmp f + 1
+15: goto 17
+16: goto 28
+17: f = 0
+loop4:
+18: b = f + 1
+19: b = b * 256
+20: b = b > e
+21: jmp b + 1
+22: goto 24
+23: goto 26
+24: f++
+25: goto loop4
+26: e = f
+27: goto loop3
+28: f = d == a
+29: jmp f + 1
+30: goto loop2
+
+------------
+
+ 0: d = 123
+loop1:
+ 1: d = d & 456
+ 2: d = d == 72
+ 3: if (d == 72) goto 5 else goto 4
+ 4: goto loop1
+ 5: d = 0
+loop2:
+ 6: e = d | 65536
+ 7: d = 1107552
+loop3:
+ 8: f = e & 255
+ 9: d = d + f
+10: d = d & 16777215
+11: d = d * 65899
+12: d = d & 16777215
+13: f = 256 > e
+14: if (256 > e) goto 16 else goto 15
+15: goto 17
+16: goto 28
+17: f = 0
+loop4:
+18: b = f + 1
+19: b = b * 256
+20: b = b > e
+21: if (b > e) goto 23 else goto 22
+22: goto 24
+23: goto 26
+24: f++
+25: goto loop4
+26: e = f
+27: goto loop3
+28: f = d == a
+29: if (d == a) goto end else goto 30
+30: goto loop2
+
+------------
+
+ 0: d = 123
+loop1:
+ 1: d = d & 456
+ 2: d = d == 72
+ 3: if (d == 72) continue else goto loop1
+ 5: d = 0
+loop2:
+ 6: e = d | 65536
+ 7: d = 1107552
+loop3:
+ 8: f = e & 255
+ 9: d = d + f
+10: d = d & 16777215
+11: d = d * 65899
+12: d = d & 16777215
+13: f = 256 > e
+14: if (256 > e) goto 28 else continue
+17: f = 0
+loop4:
+18: b = f + 1
+19: b = b * 256
+20: b = b > e
+21: if (b > e) goto 26 else continue
+24: f++
+25: goto loop4
+26: e = f
+27: goto loop3
+28: f = d == a
+29: if (d == a) goto end else goto loop 2
+
+------------
+
+d = 123
+do {
+    d = d & 456
+    d = d == 72
+} while(d != 72)
+
+d = 0
+do {
+    e = d | 65536
+    d = 1107552
+
+    loop1 {
+        f = e & 255
+        d = d + f
+        d = d & 16777215
+        d = d * 65899
+        d = d & 16777215
+        f = 256 > e
+
+        if (256 > e) break loop1
+
+        f = 0
+        loop2 {
+            b = f + 1
+            b = b * 256
+            b = b > e
+            if (b > e) break loop2
+            f++
+        }
+
+        e = f
+    }
+
+    f = d == a
+} while(d != a)
+
+------------
+
+-- 123 = 001111011
+-- 456 = 111001000
+--       001001000 = 72
+
+a = input
+b = 0
+d = 0
+e = 0
+f = 0
+
+do {
+    e = d | 65536
+    d = 1107552
+
+    loop1 {
+        f = e & 255
+        d = d + f
+        d = d & 16777215
+        d = d * 65899
+        d = d & 16777215
+
+        if (256 > e) break loop1
+
+        f = 0
+        loop2 {
+            b = f + 1
+            b = b * 256
+
+            if (b > e) break loop2
+            f++
+        }
+
+        e = f
+    }
+} while(d != a)
+
+------------
+
+Wat is a op het einde?
+
+a = input
+
+d = 0
+e = 0
+f = 0
+
+do {
+    e = d | 65536
+    d = 1107552
+
+    loop1 {
+        f = e & 255
+        d = d + f
+        d = d & 16777215
+        d = d * 65899
+        d = d & 16777215
+
+        if (256 > e) break loop1
+
+        f = 0
+        loop2 {
+            b = f + 1
+            b = b * 256
+
+            if (b > e) break loop2
+            f++
+        }
+
+        e = f
+    }
+} while(d != a)
+
+------------
+
+Wat is d op het einde?
+
+a = input
+
+d = 0
+
+e = d | 65536
+d = 1107552
+
+loop1 {
+    f = e & 255
+    d = d + f
+    d = d & 16777215
+    d = d * 65899
+    d = d & 16777215
+
+    if (256 > e) break loop1
+
+    f = 0
+    loop2 {
+        b = f + 1
+        b = b * 256
+
+        if (b > e) break loop2
+        f++
+    }
+
+    e = f
+}
+
+------------
+
+Wat is d op het einde?
+
+e = 65536             -- 2 ^ 16 = 1 0{16}
+d = 1107552
+
+loop1 {
+    f = e & 255       -- Last 8 bits
+    d = d + f
+    d = d & 16777215  -- Last 24 bits
+    d = d * 65899
+    d = d & 16777215  -- Last 24 bits
+
+    if (e < 256) break loop1
+
+    f = 0
+    loop2 {
+        b = f + 1
+        b = b * 256
+
+        if (b > e) break loop2
+        f++
+    }
+
+    e = f
+}
